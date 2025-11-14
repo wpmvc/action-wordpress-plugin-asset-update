@@ -82,7 +82,7 @@ echo "ℹ︎ SVN Stable Tag: $SVN_STABLE_TAG"
 # Check if stable tag changed
 if [[ "$LOCAL_STABLE_TAG" != "$SVN_STABLE_TAG" ]]; then
     echo "🛑 Stable tag has changed (Local: $LOCAL_STABLE_TAG, SVN: $SVN_STABLE_TAG). Exiting action."
-    exit 0
+    exit 1
 fi
 
 # Copy only readme.txt
