@@ -79,13 +79,13 @@ else
 fi
 echo "ℹ︎ SVN Stable Tag: $SVN_STABLE_TAG"
 
-# Check if stable tag changed
+# Fail the action if stable tag has changed
 if [[ "$LOCAL_STABLE_TAG" != "$SVN_STABLE_TAG" ]]; then
-    echo "🛑 Stable tag has changed (Local: $LOCAL_STABLE_TAG, SVN: $SVN_STABLE_TAG). Exiting action."
+    echo "🛑 Stable tag has changed (Local: $LOCAL_STABLE_TAG, SVN: $SVN_STABLE_TAG). Failing the action."
     exit 1
 fi
 
-# Copy only readme.txt
+# Copy only readme.txt to trunk
 echo "➤ Copying readme.txt to trunk..."
 cp "$GITHUB_WORKSPACE/$README_NAME" "trunk/$README_NAME"
 
@@ -113,15 +113,16 @@ for ext in png jpg gif svg; do
     fi
 done
 
-echo "➤ Preparing files for commit..."
-
-# Show SVN status
-svn status
-
-if [[ -z $(svn stat) ]]; then
-	echo "🛑 Nothing to deploy!"
-	exit 0
+# Update readme.txt in the stable tag folder
+if svn info "tags/$LOCAL_STABLE_TAG" > /dev/null 2>&1; then
+    svn update --set-depth infinity "tags/$LOCAL_STABLE_TAG"
+    echo "➤ Copying readme.txt to tags/$LOCAL_STABLE_TAG/"
+    cp "$GITHUB_WORKSPACE/$README_NAME" "tags/$LOCAL_STABLE_TAG/$README_NAME"
+else
+    echo "ℹ︎ Tag $LOCAL_STABLE_TAG not found in SVN, skipping tag update."
 fi
+
+echo "➤ Preparing files for commit..."
 
 # Add new files and remove deleted files
 svn add . --force > /dev/null
@@ -130,11 +131,11 @@ svn status | grep '^\!' | sed 's/! *//' | xargs -I% svn rm %@ > /dev/null
 # Resolve SVN out-of-date errors
 svn update
 
-# Now show full SVN status
+# Show final SVN status
 svn status
 
 # Commit changes
-echo "➤ Committing files..."
-svn commit -m "Updating readme/assets from GitHub" --no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+# echo "➤ Committing files..."
+# svn commit -m "Updating readme/assets from GitHub" --no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
-echo "✓ Plugin assets and readme updated!"
+# echo "✓ Plugin assets and readme updated (including tag)!"
