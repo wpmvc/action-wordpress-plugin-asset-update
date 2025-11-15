@@ -60,8 +60,13 @@ SVN_DIR="${HOME}/svn-${SLUG}"
 echo "➤ Checking out WordPress.org repository..."
 svn checkout --depth immediates "$SVN_URL" "$SVN_DIR"
 cd "$SVN_DIR"
-svn update --set-depth infinity assets
+
+# Update trunk and assets fully
 svn update --set-depth infinity trunk
+svn update --set-depth infinity assets
+
+# Update tags folder to see existing tags
+svn update --set-depth immediates tags
 
 # Extract Stable Tag from local readme.txt
 LOCAL_STABLE_TAG=$(grep -m 1 -E "^([*+-]\s+)?Stable tag:" "$GITHUB_WORKSPACE/$README_NAME" | tr -d '\r\n' | awk -F ' ' '{print $NF}')
