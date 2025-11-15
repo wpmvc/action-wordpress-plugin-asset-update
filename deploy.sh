@@ -140,7 +140,7 @@ svn update
 svn status
 
 # Commit changes
-# echo "➤ Committing files..."
-# svn commit -m "Updating readme/assets from GitHub" --no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+echo "➤ Committing files..."
+svn commit -m "Updating readme/assets from GitHub" --no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
-# echo "✓ Plugin assets and readme updated (including tag)!"
+echo "✓ Plugin assets and readme updated (including tag)!"
